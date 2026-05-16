@@ -5,16 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FitArogya AI | Holistic Health Platform</title>
     
-    <!-- FONTS -->
     <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@300,500,700,900&f[]=satoshi@300,500,700,900&display=swap" rel="stylesheet">
-    
-    <!-- TAILWIND CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- ICONS -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     
-    <!-- STYLES -->
     <style>
         :root {
             --bg: #050505;
@@ -24,15 +18,16 @@
             --purple: #7C3AED;
         }
         
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
             background-color: var(--bg);
             color: white;
             font-family: 'Satoshi', sans-serif;
+            overflow-x: hidden;
         }
         
-        .font-cabinet {
-            font-family: 'Cabinet Grotesk', sans-serif;
-        }
+        .font-cabinet { font-family: 'Cabinet Grotesk', sans-serif; }
         
         .glass {
             background: rgba(255, 255, 255, 0.03);
@@ -43,194 +38,516 @@
         .glow-btn {
             background: linear-gradient(90deg, #06B6D4, #EC4899);
             box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
         
         .glow-btn:hover {
             transform: scale(1.05) translateY(-2px);
             box-shadow: 0 0 50px rgba(6, 182, 212, 0.5);
         }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #06B6D4; border-radius: 2px; }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scanPulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+        @keyframes gridMove {
+            from { background-position: 0 0; }
+            to { background-position: 40px 40px; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+        }
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(6,182,212,0.3); }
+            50% { box-shadow: 0 0 50px rgba(6,182,212,0.7), 0 0 80px rgba(236,72,153,0.3); }
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes counterSpin { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        @keyframes barFill { from { width: 0%; } to { width: var(--target-width); } }
+
+        .animate-fade-up { animation: fadeInUp 0.8s ease forwards; }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        .animate-glow-pulse { animation: glowPulse 2s ease-in-out infinite; }
+
+        /* Grid background */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(6,182,212,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6,182,212,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 8s linear infinite;
+        }
+
+        /* Nav blur on scroll */
+        .nav-scrolled { background: rgba(5,5,5,0.95) !important; backdrop-filter: blur(20px); }
+
+        /* Scan rings */
+        .scan-ring-1 { animation: spin 6s linear infinite; }
+        .scan-ring-2 { animation: counterSpin 4s linear infinite; }
+        .scan-ring-3 { animation: spin 10s linear infinite; }
+
+        /* Feature cards hover */
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .feature-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(6,182,212,0.4) !important;
+            background: rgba(6,182,212,0.05) !important;
+        }
+
+        /* Progress bars */
+        .progress-bar {
+            height: 2px;
+            background: linear-gradient(90deg, #06B6D4, #EC4899);
+            border-radius: 1px;
+            transform-origin: left;
+            animation: barFill 2s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        /* Stat number animation */
+        .stat-num {
+            background: linear-gradient(135deg, #06B6D4, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Noise overlay */
+        .noise::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.4;
+        }
+
+        /* Modal */
+        .modal-open { overflow: hidden; }
+
+        /* Section reveal */
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #06B6D4, #EC4899, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Ticker */
+        @keyframes ticker {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+        .ticker-inner { animation: ticker 20s linear infinite; white-space: nowrap; }
+
+        /* Mobile menu */
+        .mobile-menu { display: none; }
+        @media (max-width: 768px) {
+            .mobile-menu.open { display: flex; }
+        }
     </style>
 </head>
 
-<body>
+<body class="noise">
+
+    <!-- TICKER BAR -->
+    <div class="fixed top-0 left-0 right-0 z-[200] bg-[#06B6D4] py-1.5 overflow-hidden">
+        <div class="ticker-inner inline-flex gap-16 text-[9px] font-cabinet font-[900] uppercase tracking-[0.3em] text-black">
+            <span>FitArogya AI v2.0</span><span>•</span>
+            <span>Skin Analysis Active</span><span>•</span>
+            <span>Nutrition Tracker Live</span><span>•</span>
+            <span>AI Engine Online</span><span>•</span>
+            <span>10k+ Users</span><span>•</span>
+            <span>FitArogya AI v2.0</span><span>•</span>
+            <span>Skin Analysis Active</span><span>•</span>
+            <span>Nutrition Tracker Live</span><span>•</span>
+            <span>AI Engine Online</span><span>•</span>
+            <span>10k+ Users</span><span>•</span>
+        </div>
+    </div>
+
     <!-- NAVIGATION -->
-    <nav id="main-nav" class="fixed top-0 w-full z-[100] px-6 lg:px-12 py-8 flex justify-between items-center bg-[#050505] border-b border-white/5">
+    <nav id="main-nav" class="fixed top-[28px] w-full z-[100] px-6 lg:px-12 py-5 flex justify-between items-center transition-all duration-300" style="background: transparent;">
         <div class="flex items-center gap-3">
-            <a href="#" id="nav-logo" class="text-2xl font-cabinet font-[900] uppercase tracking-tighter flex items-center">
+            <a href="#" class="text-xl font-cabinet font-[900] uppercase tracking-tighter flex items-center gap-2">
                 FitArogya
-                <span class="block w-2.5 h-2.5 bg-[#EC4899] rounded-full animate-pulse ml-3 border-2 border-white/20"></span>
+                <span class="w-2 h-2 bg-[#EC4899] rounded-full animate-pulse"></span>
             </a>
         </div>
-        <div class="hidden md:flex gap-12 items-center uppercase tracking-[0.3em] text-[10px] font-bold opacity-60">
-            <a href="#skin-analysis" class="hover:opacity-100 transition-all">Skin</a>
-            <a href="#food-tracker" class="hover:opacity-100 transition-all">Nutrition</a>
-            <a href="#workout-tracker" class="hover:opacity-100 transition-all">Workout</a>
+        <div class="hidden md:flex gap-10 items-center uppercase tracking-[0.25em] text-[10px] font-bold text-white/50">
+            <a href="#skin-analysis" class="hover:text-white transition-colors">Skin</a>
+            <a href="#food-tracker" class="hover:text-white transition-colors">Nutrition</a>
+            <a href="#workout-tracker" class="hover:text-white transition-colors">Workout</a>
+            <a href="#stats" class="hover:text-white transition-colors">Stats</a>
         </div>
-        <a href="#" class="bg-white text-black px-8 py-3 uppercase font-cabinet font-[900] text-[11px] tracking-widest hover:scale-105 transition-transform">
-            Uplink
-        </a>
+        <div class="flex items-center gap-4">
+            <a href="#skin-analysis" class="glow-btn px-6 py-2.5 text-[10px] font-cabinet font-[900] uppercase tracking-widest text-white hidden md:block">
+                Start Free
+            </a>
+            <button id="mobile-menu-btn" class="md:hidden text-white/60 hover:text-white">
+                <iconify-icon icon="lucide:menu" class="text-2xl"></iconify-icon>
+            </button>
+        </div>
     </nav>
 
-    <!-- HERO / SKIN ANALYSIS SECTION -->
-    <section id="skin-analysis" class="relative min-h-screen flex items-center justify-center overflow-hidden border-b border-white/5 pt-20">
-        <main class="relative z-10 container mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center justify-center gap-12">
-            <!-- LEFT: TEXT CONTENT -->
+    <!-- MOBILE MENU -->
+    <div id="mobile-menu" class="mobile-menu fixed inset-0 z-[150] bg-[#050505] flex-col items-center justify-center gap-8 text-center pt-20">
+        <button id="mobile-close" class="absolute top-8 right-6 text-white/40 hover:text-white">
+            <iconify-icon icon="lucide:x" class="text-3xl"></iconify-icon>
+        </button>
+        <a href="#skin-analysis" class="text-4xl font-cabinet font-[900] uppercase mobile-nav-link">Skin</a>
+        <a href="#food-tracker" class="text-4xl font-cabinet font-[900] uppercase mobile-nav-link">Nutrition</a>
+        <a href="#workout-tracker" class="text-4xl font-cabinet font-[900] uppercase mobile-nav-link">Workout</a>
+        <a href="#stats" class="glow-btn px-10 py-4 text-sm font-cabinet font-[900] uppercase tracking-widest text-white mt-4">Start Free</a>
+    </div>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section id="skin-analysis" class="relative min-h-screen flex items-center justify-center overflow-hidden border-b border-white/5 pt-28">
+        <!-- Grid bg -->
+        <div class="absolute inset-0 grid-bg opacity-60"></div>
+        <!-- Radial glow -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full" style="background: radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%);"></div>
+
+        <main class="relative z-10 container mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center justify-center gap-16 py-16">
+            
+            <!-- LEFT: TEXT -->
             <div class="w-full lg:w-1/2 flex flex-col items-start">
-                <h1 class="text-8xl lg:text-9xl font-cabinet font-[900] uppercase tracking-tighter mb-4">
-                    FitArogya
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-2 h-2 bg-[#06B6D4] rounded-full animate-pulse"></span>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-[#06B6D4]">AI Health Platform</span>
+                </div>
+
+                <h1 class="text-7xl lg:text-[100px] font-cabinet font-[900] uppercase tracking-tighter leading-none mb-2">
+                    Fit
                 </h1>
-                <h2 class="text-[#06B6D4] text-lg lg:text-2xl font-bold uppercase tracking-[0.25em] mb-4">
-                    Health & Fitness
-                </h2>
-                <p class="text-white/90 text-lg lg:text-xl font-light leading-relaxed max-w-xl mb-10">
-                    AI-powered platform for skin analysis, nutrition tracking, and workout optimization in real-time.
+                <h1 class="text-7xl lg:text-[100px] font-cabinet font-[900] uppercase tracking-tighter leading-none mb-6 gradient-text">
+                    Arogya
+                </h1>
+
+                <p class="text-white/60 text-base lg:text-lg font-light leading-relaxed max-w-lg mb-10">
+                    AI-powered platform for skin analysis, nutrition tracking, and workout optimization. Real-time intelligence for your health journey.
                 </p>
-                <button class="glow-btn px-10 py-5 text-xs font-cabinet font-[900] uppercase tracking-[0.2em] text-white">
-                    Start Free Scan
-                </button>
+
+                <div class="flex flex-wrap gap-4 mb-12">
+                    <button class="glow-btn px-10 py-4 text-xs font-cabinet font-[900] uppercase tracking-[0.2em] text-white">
+                        Start Free Scan
+                    </button>
+                    <a href="#food-tracker" class="px-10 py-4 glass text-xs font-cabinet font-[900] uppercase tracking-[0.2em] hover:bg-white/10 transition-all">
+                        Explore Features
+                    </a>
+                </div>
+
+                <!-- Quick stats -->
+                <div class="flex gap-8">
+                    <div>
+                        <div class="text-2xl font-cabinet font-[900] stat-num">98%</div>
+                        <div class="text-[9px] text-white/30 uppercase tracking-widest font-bold">Accuracy</div>
+                    </div>
+                    <div class="w-px bg-white/10"></div>
+                    <div>
+                        <div class="text-2xl font-cabinet font-[900] stat-num">10k+</div>
+                        <div class="text-[9px] text-white/30 uppercase tracking-widest font-bold">Users</div>
+                    </div>
+                    <div class="w-px bg-white/10"></div>
+                    <div>
+                        <div class="text-2xl font-cabinet font-[900] stat-num">24/7</div>
+                        <div class="text-[9px] text-white/30 uppercase tracking-widest font-bold">AI Engine</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- RIGHT: SCANNER VISUALIZATION -->
+            <!-- RIGHT: SCANNER -->
             <div class="w-full lg:w-1/2 flex items-center justify-center">
-                <div class="relative w-[320px] h-[320px] lg:w-[450px] lg:h-[450px] flex items-center justify-center">
-                    <div class="absolute inset-0 rounded-full border border-white/5"></div>
-                    <div class="absolute inset-0 rounded-full border-2 border-[#06B6D4] animate-spin" style="animation-duration: 4.5s;"></div>
-                    <div class="text-center">
-                        <div class="text-6xl font-cabinet font-[900] text-[#06B6D4]" id="scan-percent">0%</div>
-                        <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-4">Analyzing...</p>
+                <div class="relative w-[300px] h-[300px] lg:w-[420px] lg:h-[420px] flex items-center justify-center animate-float">
+                    
+                    <!-- Outer glow -->
+                    <div class="absolute inset-0 rounded-full animate-glow-pulse" style="background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%);"></div>
+                    
+                    <!-- Ring 1 -->
+                    <div class="absolute inset-0 rounded-full border border-[#06B6D4]/20 scan-ring-1"></div>
+                    <!-- Ring 2 -->
+                    <div class="absolute inset-4 rounded-full border border-[#EC4899]/20 scan-ring-2"></div>
+                    <!-- Ring 3 -->
+                    <div class="absolute inset-8 rounded-full border-2 border-dashed border-[#06B6D4]/40 scan-ring-3"></div>
+                    <!-- Ring 4 - solid -->
+                    <div class="absolute inset-16 rounded-full border border-white/5"></div>
+
+                    <!-- Corner brackets -->
+                    <div class="absolute top-8 left-8 w-8 h-8 border-t-2 border-l-2 border-[#06B6D4]"></div>
+                    <div class="absolute top-8 right-8 w-8 h-8 border-t-2 border-r-2 border-[#06B6D4]"></div>
+                    <div class="absolute bottom-8 left-8 w-8 h-8 border-b-2 border-l-2 border-[#06B6D4]"></div>
+                    <div class="absolute bottom-8 right-8 w-8 h-8 border-b-2 border-r-2 border-[#06B6D4]"></div>
+
+                    <!-- Center content -->
+                    <div class="relative text-center z-10">
+                        <div class="text-5xl lg:text-7xl font-cabinet font-[900] text-[#06B6D4]" id="scan-percent">0%</div>
+                        <p class="text-[9px] font-bold text-white/30 uppercase tracking-[0.4em] mt-2">Analyzing Skin</p>
+                        <!-- Scan line -->
+                        <div class="absolute left-1/2 -translate-x-1/2 mt-4 w-24 h-px" style="background: linear-gradient(90deg, transparent, #06B6D4, transparent); animation: scanPulse 2s ease-in-out infinite;"></div>
                     </div>
                 </div>
             </div>
         </main>
+
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
+            <span class="text-[9px] uppercase tracking-[0.4em] font-bold">Scroll</span>
+            <div class="w-px h-12 bg-gradient-to-b from-white/40 to-transparent"></div>
+        </div>
     </section>
 
-    <!-- FOOD CALORIE TRACKER SECTION -->
-    <section id="food-tracker" class="py-24 border-b border-white/5 bg-[#080808]">
+    <!-- ===== FOOD TRACKER SECTION ===== -->
+    <section id="food-tracker" class="py-24 border-b border-white/5 bg-[#080808] relative overflow-hidden">
+        <!-- BG accent -->
+        <div class="absolute top-0 right-0 w-[400px] h-[400px] rounded-full opacity-5" style="background: radial-gradient(circle, #06B6D4, transparent);"></div>
+
         <div class="container mx-auto px-6 lg:px-12">
-            <header class="mb-16">
-                <h2 class="text-5xl lg:text-7xl font-cabinet font-[900] uppercase tracking-tighter mb-4">
-                    Food <span class="text-[#06B6D4]">Calorie Tracker</span>
+            <header class="mb-16 reveal">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-6 h-px bg-[#06B6D4]"></div>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-[#06B6D4]">AI Nutrition</span>
+                </div>
+                <h2 class="text-5xl lg:text-7xl font-cabinet font-[900] uppercase tracking-tighter">
+                    Food <span class="text-[#06B6D4]">Calorie</span><br>Tracker
                 </h2>
-                <p class="text-white/40 text-xs font-bold uppercase tracking-[0.4em]">AI-Powered Nutrition Analysis</p>
             </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <!-- LEFT: UPLOAD AREA -->
-                <div class="glass aspect-square flex flex-col items-center justify-center p-12 text-center">
-                    <div class="w-32 h-32 rounded-full glass flex items-center justify-center mb-8">
-                        <iconify-icon icon="lucide:camera-plus" class="text-5xl text-[#06B6D4]"></iconify-icon>
-                    </div>
-                    <h3 class="text-3xl font-cabinet font-black uppercase mb-4">Upload Food Photo</h3>
-                    <p class="text-white/40 font-light max-w-xs mx-auto mb-10">
-                        AI analyzes calories, macros & nutrition facts instantly.
-                    </p>
-                    <div class="flex flex-col gap-4 w-full lg:max-w-xs">
-                        <button class="w-full px-8 py-3 bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all">
-                            Launch Lens
-                        </button>
-                        <button id="add-food-entry-btn" class="w-full px-8 py-3 bg-white/5 border border-[#06B6D4]/40 text-[10px] font-bold uppercase tracking-widest hover:bg-[#06B6D4]/10 transition-all flex items-center justify-center gap-2">
-                            <iconify-icon icon="lucide:plus" class="text-sm"></iconify-icon>
-                            Add Food Entry
-                        </button>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                <!-- LEFT: UPLOAD -->
+                <div class="reveal">
+                    <div class="glass rounded-3xl aspect-square flex flex-col items-center justify-center p-12 text-center group hover:border-[#06B6D4]/30 transition-all duration-500 relative overflow-hidden">
+                        <!-- Inner glow on hover -->
+                        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.05), transparent 70%);"></div>
+                        
+                        <div class="w-28 h-28 rounded-full glass flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                            <iconify-icon icon="lucide:camera-plus" class="text-5xl text-[#06B6D4]"></iconify-icon>
+                        </div>
+                        <h3 class="text-3xl font-cabinet font-black uppercase mb-4 tracking-tighter">Upload Food Photo</h3>
+                        <p class="text-white/40 font-light max-w-xs mx-auto mb-10 text-sm">
+                            AI analyzes calories, macros & nutrition facts in under 2 seconds.
+                        </p>
+                        <div class="flex flex-col gap-3 w-full max-w-xs relative z-10">
+                            <button class="w-full px-8 py-3 bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-200">
+                                Launch Lens
+                            </button>
+                            <button id="add-food-entry-btn" class="w-full px-8 py-3 border border-[#06B6D4]/40 text-[10px] font-bold uppercase tracking-widest hover:bg-[#06B6D4]/10 hover:border-[#06B6D4] transition-all flex items-center justify-center gap-2">
+                                <iconify-icon icon="lucide:plus" class="text-sm"></iconify-icon>
+                                Add Food Entry
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- RIGHT: FOOD CARDS -->
-                <div class="grid grid-cols-1 gap-6">
-                    <div class="glass p-6 rounded-2xl flex items-center justify-between border-l-4 border-l-orange-500">
-                        <div class="flex items-center gap-6">
-                            <iconify-icon icon="lucide:utensils" class="text-3xl text-orange-500"></iconify-icon>
-                            <div>
-                                <h4 class="text-xl font-cabinet font-black uppercase mb-1">Biryani</h4>
-                                <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">450 cal // 12g Pro // 35g Carb</p>
-                            </div>
+                <div class="flex flex-col gap-4 reveal" style="animation-delay: 0.2s;">
+                    <!-- Daily summary -->
+                    <div class="glass rounded-2xl p-5 mb-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white/40">Today's Intake</span>
+                            <span class="text-[10px] font-bold text-[#06B6D4] uppercase tracking-widest">950 / 2000 CAL</span>
                         </div>
-                        <span class="text-[10px] font-bold text-orange-500 uppercase tracking-widest bg-orange-500/10 px-3 py-1 rounded-full">High Cal</span>
+                        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full progress-bar" style="--target-width: 47.5%; width: 47.5%;"></div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-[9px] text-white/30 font-bold uppercase tracking-widest">
+                            <span>0</span><span>Goal: 2000 kcal</span>
+                        </div>
                     </div>
 
-                    <div class="glass p-6 rounded-2xl flex items-center justify-between border-l-4 border-l-green-500">
-                        <div class="flex items-center gap-6">
-                            <iconify-icon icon="lucide:beef" class="text-3xl text-green-500"></iconify-icon>
-                            <div>
-                                <h4 class="text-xl font-cabinet font-black uppercase mb-1">Paneer Tikka</h4>
-                                <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">320 cal // 28g Pro // 8g Carb</p>
+                    <!-- Food item 1 -->
+                    <div class="feature-card glass p-5 rounded-2xl flex items-center gap-5 border-l-[3px] border-l-orange-500">
+                        <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0">
+                            <iconify-icon icon="lucide:utensils" class="text-2xl text-orange-500"></iconify-icon>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-base font-cabinet font-black uppercase mb-1">Biryani</h4>
+                            <p class="text-[9px] font-bold text-white/30 uppercase tracking-widest">450 cal · 12g Pro · 35g Carb · 18g Fat</p>
+                            <div class="flex gap-2 mt-2">
+                                <div class="h-1 bg-[#EC4899] rounded-full" style="width: 20%"></div>
+                                <div class="h-1 bg-[#06B6D4] rounded-full" style="width: 58%"></div>
+                                <div class="h-1 bg-[#7C3AED] rounded-full" style="width: 22%"></div>
                             </div>
                         </div>
-                        <span class="text-[10px] font-bold text-green-500 uppercase tracking-widest bg-green-500/10 px-3 py-1 rounded-full">Optimal</span>
+                        <span class="text-[9px] font-bold text-orange-500 uppercase bg-orange-500/10 px-3 py-1 rounded-full">High Cal</span>
                     </div>
 
-                    <div class="glass p-6 rounded-2xl flex items-center justify-between border-l-4 border-l-green-500">
-                        <div class="flex items-center gap-6">
-                            <iconify-icon icon="lucide:leaf" class="text-3xl text-green-500"></iconify-icon>
-                            <div>
-                                <h4 class="text-xl font-cabinet font-black uppercase mb-1">Green Smoothie</h4>
-                                <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest">180 cal // 6g Pro // 32g Carb</p>
+                    <!-- Food item 2 -->
+                    <div class="feature-card glass p-5 rounded-2xl flex items-center gap-5 border-l-[3px] border-l-green-500">
+                        <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                            <iconify-icon icon="lucide:beef" class="text-2xl text-green-500"></iconify-icon>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-base font-cabinet font-black uppercase mb-1">Paneer Tikka</h4>
+                            <p class="text-[9px] font-bold text-white/30 uppercase tracking-widest">320 cal · 28g Pro · 8g Carb · 14g Fat</p>
+                            <div class="flex gap-2 mt-2">
+                                <div class="h-1 bg-[#EC4899] rounded-full" style="width: 46%"></div>
+                                <div class="h-1 bg-[#06B6D4] rounded-full" style="width: 13%"></div>
+                                <div class="h-1 bg-[#7C3AED] rounded-full" style="width: 41%"></div>
                             </div>
                         </div>
-                        <span class="text-[10px] font-bold text-green-500 uppercase tracking-widest bg-green-500/10 px-3 py-1 rounded-full">Healthy</span>
+                        <span class="text-[9px] font-bold text-green-500 uppercase bg-green-500/10 px-3 py-1 rounded-full">Optimal</span>
+                    </div>
+
+                    <!-- Food item 3 -->
+                    <div class="feature-card glass p-5 rounded-2xl flex items-center gap-5 border-l-[3px] border-l-green-500">
+                        <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                            <iconify-icon icon="lucide:leaf" class="text-2xl text-green-500"></iconify-icon>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-base font-cabinet font-black uppercase mb-1">Green Smoothie</h4>
+                            <p class="text-[9px] font-bold text-white/30 uppercase tracking-widest">180 cal · 6g Pro · 32g Carb · 4g Fat</p>
+                            <div class="flex gap-2 mt-2">
+                                <div class="h-1 bg-[#EC4899] rounded-full" style="width: 10%"></div>
+                                <div class="h-1 bg-[#06B6D4] rounded-full" style="width: 71%"></div>
+                                <div class="h-1 bg-[#7C3AED] rounded-full" style="width: 19%"></div>
+                            </div>
+                        </div>
+                        <span class="text-[9px] font-bold text-green-500 uppercase bg-green-500/10 px-3 py-1 rounded-full">Healthy</span>
+                    </div>
+
+                    <!-- Macro legend -->
+                    <div class="flex gap-6 px-2">
+                        <div class="flex items-center gap-2"><div class="w-3 h-1 bg-[#EC4899] rounded-full"></div><span class="text-[9px] text-white/30 font-bold uppercase tracking-widest">Protein</span></div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-1 bg-[#06B6D4] rounded-full"></div><span class="text-[9px] text-white/30 font-bold uppercase tracking-widest">Carbs</span></div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-1 bg-[#7C3AED] rounded-full"></div><span class="text-[9px] text-white/30 font-bold uppercase tracking-widest">Fat</span></div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- WORKOUT TRACKER SECTION -->
-    <section id="workout-tracker" class="py-24 border-b border-white/5">
+    <!-- ===== WORKOUT SECTION ===== -->
+    <section id="workout-tracker" class="py-24 border-b border-white/5 relative overflow-hidden">
+        <!-- BG accent -->
+        <div class="absolute top-0 left-0 w-[500px] h-[500px] rounded-full opacity-5" style="background: radial-gradient(circle, #EC4899, transparent);"></div>
+
         <div class="container mx-auto px-6 lg:px-12">
-            <header class="mb-16">
-                <h2 class="text-5xl lg:text-7xl font-cabinet font-[900] uppercase tracking-tighter mb-4">
+            <header class="mb-16 reveal">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-6 h-px bg-[#EC4899]"></div>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-[#EC4899]">Performance</span>
+                </div>
+                <h2 class="text-5xl lg:text-7xl font-cabinet font-[900] uppercase tracking-tighter">
                     Workout <span class="text-[#EC4899]">Tracker</span>
                 </h2>
-                <p class="text-white/40 text-xs font-bold uppercase tracking-[0.4em]">Dynamic Performance Logging</p>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <!-- LEFT: CONTENT -->
-                <div>
-                    <div class="flex flex-wrap gap-4 mb-12">
-                        <button class="px-6 py-3 glass text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all flex items-center gap-2">
+                <!-- LEFT: WORKOUT CARDS -->
+                <div class="reveal">
+                    <div class="flex flex-wrap gap-3 mb-10">
+                        <button class="px-6 py-2.5 glass text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all flex items-center gap-2 active-filter" id="filter-cardio">
                             <iconify-icon icon="lucide:heart-pulse"></iconify-icon> Cardio
                         </button>
-                        <button class="px-6 py-3 glass text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all flex items-center gap-2">
+                        <button class="px-6 py-2.5 glass text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all flex items-center gap-2" id="filter-strength">
                             <iconify-icon icon="lucide:dumbbell"></iconify-icon> Strength
                         </button>
-                        <button class="px-6 py-3 glass text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all flex items-center gap-2">
+                        <button class="px-6 py-2.5 glass text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all flex items-center gap-2" id="filter-yoga">
                             <iconify-icon icon="lucide:accessibility"></iconify-icon> Yoga
                         </button>
                     </div>
 
                     <div class="space-y-4">
-                        <div class="glass p-5 rounded-xl flex items-center gap-6">
-                            <div class="w-12 h-12 rounded-full bg-[#EC4899]/10 flex items-center justify-center">
+                        <div class="feature-card glass p-5 rounded-2xl flex items-center gap-5 border border-[#EC4899]/20">
+                            <div class="w-12 h-12 rounded-xl bg-[#EC4899]/10 flex items-center justify-center flex-shrink-0">
                                 <iconify-icon icon="lucide:timer" class="text-2xl text-[#EC4899]"></iconify-icon>
                             </div>
                             <div class="flex-1">
-                                <h4 class="text-sm font-bold uppercase tracking-widest">30 min Running</h4>
-                                <p class="text-xs text-white/40">250 cal burned // 145 bpm avg</p>
+                                <h4 class="text-sm font-bold uppercase tracking-widest mb-1">30 min Running</h4>
+                                <p class="text-xs text-white/40">250 cal burned · 145 bpm avg</p>
+                                <div class="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#EC4899] rounded-full" style="width: 75%;"></div>
+                                </div>
                             </div>
+                            <span class="text-[9px] font-bold text-[#EC4899] uppercase bg-[#EC4899]/10 px-3 py-1 rounded-full">Done</span>
                         </div>
-                        <div class="glass p-5 rounded-xl flex items-center gap-6">
-                            <div class="w-12 h-12 rounded-full bg-[#7C3AED]/10 flex items-center justify-center">
+
+                        <div class="feature-card glass p-5 rounded-2xl flex items-center gap-5 border border-[#7C3AED]/20">
+                            <div class="w-12 h-12 rounded-xl bg-[#7C3AED]/10 flex items-center justify-center flex-shrink-0">
                                 <iconify-icon icon="lucide:activity" class="text-2xl text-[#7C3AED]"></iconify-icon>
                             </div>
                             <div class="flex-1">
-                                <h4 class="text-sm font-bold uppercase tracking-widest">45 min Yoga</h4>
-                                <p class="text-xs text-white/40">120 cal burned // +8% Flexibility</p>
+                                <h4 class="text-sm font-bold uppercase tracking-widest mb-1">45 min Yoga</h4>
+                                <p class="text-xs text-white/40">120 cal burned · +8% Flexibility</p>
+                                <div class="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#7C3AED] rounded-full" style="width: 60%;"></div>
+                                </div>
                             </div>
+                            <span class="text-[9px] font-bold text-[#7C3AED] uppercase bg-[#7C3AED]/10 px-3 py-1 rounded-full">Done</span>
+                        </div>
+
+                        <div class="feature-card glass p-5 rounded-2xl flex items-center gap-5 border border-[#06B6D4]/20">
+                            <div class="w-12 h-12 rounded-xl bg-[#06B6D4]/10 flex items-center justify-center flex-shrink-0">
+                                <iconify-icon icon="lucide:dumbbell" class="text-2xl text-[#06B6D4]"></iconify-icon>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-bold uppercase tracking-widest mb-1">Chest & Triceps</h4>
+                                <p class="text-xs text-white/40">380 cal burned · 5 exercises</p>
+                                <div class="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#06B6D4] rounded-full" style="width: 85%;"></div>
+                                </div>
+                            </div>
+                            <span class="text-[9px] font-bold text-[#06B6D4] uppercase bg-[#06B6D4]/10 px-3 py-1 rounded-full">Active</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- RIGHT: PROGRESS CIRCLE -->
-                <div class="flex items-center justify-center relative">
-                    <div class="relative w-[300px] h-[300px]">
-                        <svg class="w-full h-full transform -rotate-90">
-                            <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="4" fill="transparent" class="text-white/5" />
-                            <circle cx="50%" cy="50%" r="45%" stroke="#EC4899" stroke-width="8" fill="transparent" stroke-dasharray="1256" stroke-dashoffset="251" />
+                <div class="flex items-center justify-center reveal" style="animation-delay: 0.2s;">
+                    <div class="relative">
+                        <!-- Outer glow -->
+                        <div class="absolute inset-0 rounded-full" style="background: radial-gradient(circle, rgba(236,72,153,0.1), transparent 70%);"></div>
+
+                        <svg class="w-[280px] h-[280px] lg:w-[340px] lg:h-[340px] transform -rotate-90" viewBox="0 0 200 200">
+                            <!-- BG ring -->
+                            <circle cx="100" cy="100" r="85" stroke="rgba(255,255,255,0.04)" stroke-width="4" fill="transparent"/>
+                            <!-- Secondary ring -->
+                            <circle cx="100" cy="100" r="70" stroke="rgba(236,72,153,0.1)" stroke-width="3" fill="transparent"/>
+                            <!-- Main progress -->
+                            <circle cx="100" cy="100" r="85" stroke="url(#progressGrad)" stroke-width="8" fill="transparent" 
+                                stroke-dasharray="534" stroke-dashoffset="107" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#EC4899"/>
+                                    <stop offset="100%" stop-color="#7C3AED"/>
+                                </linearGradient>
+                            </defs>
                         </svg>
+
                         <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                            <span class="text-6xl font-cabinet font-[900]">80%</span>
-                            <span class="text-[10px] uppercase font-bold tracking-[0.4em] text-white/40">Weekly Goal</span>
+                            <span class="text-5xl lg:text-6xl font-cabinet font-[900]">80%</span>
+                            <span class="text-[9px] uppercase font-bold tracking-[0.4em] text-white/30 mt-1">Weekly Goal</span>
+                            <div class="flex gap-3 mt-4">
+                                <div class="text-center">
+                                    <div class="text-lg font-cabinet font-black text-[#EC4899]">5/7</div>
+                                    <div class="text-[8px] text-white/30 uppercase tracking-widest">Days</div>
+                                </div>
+                                <div class="w-px bg-white/10"></div>
+                                <div class="text-center">
+                                    <div class="text-lg font-cabinet font-black text-[#7C3AED]">750</div>
+                                    <div class="text-[8px] text-white/30 uppercase tracking-widest">kcal</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -238,53 +555,104 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="py-12 px-6 lg:px-12 flex justify-between items-end border-t border-white/5">
-        <div class="opacity-20 text-[10px] uppercase font-bold tracking-[0.4em]">
-            System Status: Nominal // Latency: 12ms // AI Engine: FitArogya-V1
+    <!-- ===== STATS SECTION ===== -->
+    <section id="stats" class="py-24 border-b border-white/5 bg-[#080808] relative overflow-hidden">
+        <div class="absolute inset-0 grid-bg opacity-30"></div>
+        
+        <div class="container mx-auto px-6 lg:px-12 relative z-10">
+            <div class="reveal text-center mb-16">
+                <div class="flex items-center justify-center gap-3 mb-4">
+                    <div class="w-6 h-px bg-[#7C3AED]"></div>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-[#7C3AED]">Platform Stats</span>
+                    <div class="w-6 h-px bg-[#7C3AED]"></div>
+                </div>
+                <h2 class="text-5xl lg:text-7xl font-cabinet font-[900] uppercase tracking-tighter">
+                    Numbers <span class="gradient-text">Don't Lie</span>
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                <div class="feature-card glass rounded-2xl p-8 text-center reveal">
+                    <div class="text-4xl lg:text-5xl font-cabinet font-[900] stat-num mb-2">10k+</div>
+                    <div class="text-[9px] text-white/30 font-bold uppercase tracking-[0.3em]">Active Users</div>
+                </div>
+                <div class="feature-card glass rounded-2xl p-8 text-center reveal" style="animation-delay: 0.1s;">
+                    <div class="text-4xl lg:text-5xl font-cabinet font-[900] stat-num mb-2">98%</div>
+                    <div class="text-[9px] text-white/30 font-bold uppercase tracking-[0.3em]">AI Accuracy</div>
+                </div>
+                <div class="feature-card glass rounded-2xl p-8 text-center reveal" style="animation-delay: 0.2s;">
+                    <div class="text-4xl lg:text-5xl font-cabinet font-[900] stat-num mb-2">500k</div>
+                    <div class="text-[9px] text-white/30 font-bold uppercase tracking-[0.3em]">Scans Done</div>
+                </div>
+                <div class="feature-card glass rounded-2xl p-8 text-center reveal" style="animation-delay: 0.3s;">
+                    <div class="text-4xl lg:text-5xl font-cabinet font-[900] stat-num mb-2">4.9★</div>
+                    <div class="text-[9px] text-white/30 font-bold uppercase tracking-[0.3em]">User Rating</div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="reveal text-center mt-20">
+                <p class="text-white/40 text-sm mb-6 font-light">Ready to transform your health journey?</p>
+                <button class="glow-btn px-14 py-5 text-sm font-cabinet font-[900] uppercase tracking-[0.2em] text-white">
+                    Get Started Free →
+                </button>
+            </div>
         </div>
-        <div class="flex gap-6 opacity-40">
-            <iconify-icon icon="simple-icons:nvidia" class="text-2xl"></iconify-icon>
-            <iconify-icon icon="simple-icons:openai" class="text-2xl"></iconify-icon>
-            <iconify-icon icon="simple-icons:googlecloud" class="text-2xl"></iconify-icon>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="py-10 px-6 lg:px-12 border-t border-white/5">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <span class="text-lg font-cabinet font-[900] uppercase tracking-tighter">FitArogya AI</span>
+                <span class="w-2 h-2 bg-[#EC4899] rounded-full animate-pulse"></span>
+            </div>
+            <div class="text-[9px] text-white/20 uppercase font-bold tracking-[0.4em] text-center">
+                System: Nominal · Latency: 12ms · AI Engine: FitArogya-V2
+            </div>
+            <div class="flex gap-5 opacity-30">
+                <iconify-icon icon="simple-icons:nvidia" class="text-xl hover:opacity-100 transition-opacity cursor-pointer"></iconify-icon>
+                <iconify-icon icon="simple-icons:openai" class="text-xl hover:opacity-100 transition-opacity cursor-pointer"></iconify-icon>
+                <iconify-icon icon="simple-icons:googlecloud" class="text-xl hover:opacity-100 transition-opacity cursor-pointer"></iconify-icon>
+            </div>
         </div>
     </footer>
 
-    <!-- ADD FOOD ENTRY MODAL -->
+    <!-- ===== ADD FOOD MODAL ===== -->
     <div id="food-entry-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 lg:p-6 bg-[#050505]/95 backdrop-blur-xl opacity-0 transition-opacity duration-300">
-        <div class="modal-container w-full max-w-4xl glass rounded-[2.5rem] p-8 lg:p-12 relative transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[95vh]">
-            <button id="close-modal-btn" class="absolute top-6 right-6 text-white/40 hover:text-white transition-colors">
+        <div class="modal-container w-full max-w-4xl glass rounded-[2rem] p-8 lg:p-12 relative transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[95vh]">
+            <button id="close-modal-btn" class="absolute top-6 right-6 text-white/30 hover:text-white transition-colors">
                 <iconify-icon icon="lucide:x" class="text-3xl"></iconify-icon>
             </button>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-                <!-- LEFT: UPLOAD -->
-                <div class="flex flex-col h-full">
-                    <h3 class="text-2xl font-cabinet font-black uppercase mb-8 tracking-tighter">Upload Food Photo</h3>
-                    <div class="flex-1 border-2 border-dashed border-[#06B6D4]/30 rounded-3xl p-8 flex flex-col items-center justify-center text-center group hover:border-[#06B6D4]/60 transition-all cursor-pointer bg-white/5 min-h-[250px]">
-                        <iconify-icon icon="lucide:image-plus" class="text-5xl text-[#06B6D4]/40 mb-6 group-hover:scale-110 transition-transform"></iconify-icon>
-                        <p class="text-sm font-light text-white/60 mb-2">Drag & drop food photo or click to upload</p>
-                        <p class="text-[10px] font-bold text-white/20 uppercase tracking-widest">Supported: JPG, PNG</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+                <!-- LEFT -->
+                <div class="flex flex-col">
+                    <h3 class="text-2xl font-cabinet font-black uppercase mb-6 tracking-tighter">Upload Food Photo</h3>
+                    <div class="flex-1 border-2 border-dashed border-[#06B6D4]/20 rounded-3xl p-8 flex flex-col items-center justify-center text-center group hover:border-[#06B6D4]/50 transition-all cursor-pointer min-h-[220px]">
+                        <iconify-icon icon="lucide:image-plus" class="text-5xl text-[#06B6D4]/30 mb-5 group-hover:scale-110 transition-transform group-hover:text-[#06B6D4]/60"></iconify-icon>
+                        <p class="text-sm font-light text-white/50 mb-2">Drag & drop or click to upload</p>
+                        <p class="text-[10px] font-bold text-white/20 uppercase tracking-widest">JPG, PNG supported</p>
                     </div>
-                    <div class="grid grid-cols-1 gap-4 mt-8">
-                        <button class="w-full py-4 bg-gradient-to-r from-[#06B6D4] to-orange-500 text-[10px] font-cabinet font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:scale-105 transition-all text-white">Choose From Camera</button>
-                        <button class="w-full py-4 border border-white/20 text-[10px] font-cabinet font-black uppercase tracking-[0.2em] hover:bg-white/5 transition-all">Upload From Device</button>
+                    <div class="flex flex-col gap-3 mt-6">
+                        <button class="w-full py-4 glow-btn text-[10px] font-cabinet font-black uppercase tracking-[0.2em] text-white">Choose From Camera</button>
+                        <button class="w-full py-4 border border-white/10 text-[10px] font-cabinet font-black uppercase tracking-[0.2em] hover:bg-white/5 transition-all">Upload From Device</button>
                     </div>
                 </div>
 
-                <!-- RIGHT: ANALYSIS -->
+                <!-- RIGHT -->
                 <div class="flex flex-col">
-                    <h3 class="text-2xl font-cabinet font-black uppercase mb-8 tracking-tighter">Nutrition Analysis</h3>
-                    <div class="mb-10">
+                    <h3 class="text-2xl font-cabinet font-black uppercase mb-6 tracking-tighter">Nutrition Analysis</h3>
+                    <div class="mb-8">
                         <p class="text-[10px] font-bold text-[#06B6D4] uppercase tracking-[0.3em] mb-2">Detection Result</p>
-                        <h4 class="text-4xl font-cabinet font-black uppercase mb-2">Biryani Detected</h4>
+                        <h4 class="text-3xl font-cabinet font-black uppercase mb-2">Biryani Detected</h4>
                         <div class="flex items-baseline gap-2">
-                            <span class="text-7xl font-cabinet font-black text-[#06B6D4] tracking-tighter">450</span>
-                            <span class="text-xl font-cabinet font-black text-white/40">CAL</span>
+                            <span class="text-6xl font-cabinet font-black text-[#06B6D4]">450</span>
+                            <span class="text-xl font-cabinet font-black text-white/30">CAL</span>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-4 mb-10">
+                    <div class="grid grid-cols-3 gap-3 mb-8">
                         <div class="glass p-4 rounded-2xl border-l-2 border-[#EC4899]">
                             <span class="block text-[8px] font-bold text-[#EC4899] uppercase tracking-widest mb-1">Protein</span>
                             <span class="text-xl font-cabinet font-black">12g</span>
@@ -299,25 +667,25 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-6">
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-bold text-white/40 uppercase tracking-widest">Quantity Selector</label>
-                            <select class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-xs focus:outline-none focus:border-[#06B6D4]">
-                                <option>1 Serving (Regular Plate)</option>
-                                <option>0.5 Serving (Small Bowl)</option>
-                                <option>1.5 Serving (Large Portion)</option>
-                                <option>2 Serving (Extra Large)</option>
+                    <div class="space-y-4 flex-1">
+                        <div>
+                            <label class="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">Quantity Selector</label>
+                            <select class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-xs focus:outline-none focus:border-[#06B6D4] transition-colors" style="color: white; background-color: rgba(255,255,255,0.05);">
+                                <option style="background: #111;">1 Serving (Regular Plate)</option>
+                                <option style="background: #111;">0.5 Serving (Small Bowl)</option>
+                                <option style="background: #111;">1.5 Serving (Large Portion)</option>
+                                <option style="background: #111;">2 Serving (Extra Large)</option>
                             </select>
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <span class="text-[10px] font-bold bg-orange-500/10 text-orange-500 border border-orange-500/30 px-4 py-1.5 rounded-full tracking-widest uppercase">High Calorie</span>
-                            <span class="text-[9px] font-bold text-white/40 uppercase tracking-tighter">Verified via AI Vision Engine</span>
+                            <span class="text-[9px] font-bold text-orange-500 border border-orange-500/30 bg-orange-500/10 px-4 py-1.5 rounded-full tracking-widest uppercase">High Calorie</span>
+                            <span class="text-[9px] font-bold text-white/30 uppercase tracking-tighter">Verified via AI Vision</span>
                         </div>
 
-                        <div class="flex gap-4 mt-4">
-                            <button id="add-to-log-btn" class="flex-1 glow-btn py-5 text-[10px] font-cabinet font-black uppercase tracking-[0.2em] text-white">Add to Daily Log</button>
-                            <button id="modal-cancel-btn" class="px-8 py-5 border border-white/20 text-[10px] font-cabinet font-black uppercase tracking-[0.2em] hover:bg-white/5 transition-all">Cancel</button>
+                        <div class="flex gap-3 pt-2">
+                            <button id="add-to-log-btn" class="flex-1 glow-btn py-4 text-[10px] font-cabinet font-black uppercase tracking-[0.2em] text-white">Add to Daily Log</button>
+                            <button id="modal-cancel-btn" class="px-8 py-4 border border-white/10 text-[10px] font-cabinet font-black uppercase tracking-[0.2em] hover:bg-white/5 transition-all">Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -325,69 +693,107 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT -->
+    <!-- ===== JAVASCRIPT ===== -->
     <script>
-        // Scan Counter Animation
+        // --- Scan counter ---
         let count = 0;
         const percentEl = document.getElementById('scan-percent');
-
         function updateCounter() {
             count++;
             if (percentEl) percentEl.innerText = `${count}%`;
-            if (count >= 100) {
-                count = 0;
-                setTimeout(updateCounter, 2000);
-            } else {
-                setTimeout(updateCounter, 45);
-            }
+            if (count >= 100) { count = 0; setTimeout(updateCounter, 2000); }
+            else setTimeout(updateCounter, 40);
         }
         updateCounter();
 
-        // Modal Controls
-        const foodModal = document.getElementById('food-entry-modal');
-        const openFoodModalBtn = document.getElementById('add-food-entry-btn');
-        const closeFoodModalBtn = document.getElementById('close-modal-btn');
-        const cancelFoodModalBtn = document.getElementById('modal-cancel-btn');
-        const addToLogBtn = document.getElementById('add-to-log-btn');
+        // --- Nav scroll effect ---
+        const nav = document.getElementById('main-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 60) nav.classList.add('nav-scrolled');
+            else nav.classList.remove('nav-scrolled');
+        });
 
-        const openModal = () => {
+        // --- Smooth scroll ---
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(a.getAttribute('href'));
+                if (target) { target.scrollIntoView({ behavior: 'smooth' }); closeMobileMenu(); }
+            });
+        });
+
+        // --- Mobile menu ---
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileClose = document.getElementById('mobile-close');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+        function openMobileMenu() { mobileMenu.classList.add('open'); document.body.classList.add('modal-open'); }
+        function closeMobileMenu() { mobileMenu.classList.remove('open'); document.body.classList.remove('modal-open'); }
+        mobileMenuBtn?.addEventListener('click', openMobileMenu);
+        mobileClose?.addEventListener('click', closeMobileMenu);
+        mobileNavLinks.forEach(l => l.addEventListener('click', closeMobileMenu));
+
+        // --- Scroll reveal ---
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        reveals.forEach(el => observer.observe(el));
+
+        // --- Modal ---
+        const foodModal = document.getElementById('food-entry-modal');
+        const openBtn = document.getElementById('add-food-entry-btn');
+        const closeBtn = document.getElementById('close-modal-btn');
+        const cancelBtn = document.getElementById('modal-cancel-btn');
+        const addBtn = document.getElementById('add-to-log-btn');
+
+        function openModal() {
             foodModal.classList.remove('hidden');
             foodModal.classList.add('flex');
+            document.body.classList.add('modal-open');
             setTimeout(() => {
                 foodModal.classList.remove('opacity-0');
                 foodModal.querySelector('.modal-container').classList.remove('scale-95');
             }, 10);
-        };
+        }
 
-        const closeModal = () => {
+        function closeModal() {
             foodModal.classList.add('opacity-0');
             foodModal.querySelector('.modal-container').classList.add('scale-95');
-            setTimeout(() => {
-                foodModal.classList.add('hidden');
-                foodModal.classList.remove('flex');
-            }, 300);
-        };
+            document.body.classList.remove('modal-open');
+            setTimeout(() => { foodModal.classList.add('hidden'); foodModal.classList.remove('flex'); }, 300);
+        }
 
-        openFoodModalBtn?.addEventListener('click', openModal);
-        closeFoodModalBtn?.addEventListener('click', closeModal);
-        cancelFoodModalBtn?.addEventListener('click', closeModal);
-        
-        foodModal?.addEventListener('click', (e) => {
-            if (e.target === foodModal) closeModal();
-        });
+        openBtn?.addEventListener('click', openModal);
+        closeBtn?.addEventListener('click', closeModal);
+        cancelBtn?.addEventListener('click', closeModal);
+        foodModal?.addEventListener('click', e => { if (e.target === foodModal) closeModal(); });
 
-        addToLogBtn?.addEventListener('click', () => {
-            addToLogBtn.innerText = 'ADDED TO DAILY LOG!';
-            addToLogBtn.style.backgroundColor = '#10B981';
-            addToLogBtn.style.boxShadow = '0 0 30px rgba(16, 185, 129, 0.4)';
+        addBtn?.addEventListener('click', () => {
+            addBtn.textContent = '✓ ADDED TO LOG!';
+            addBtn.style.background = '#10B981';
+            addBtn.style.boxShadow = '0 0 30px rgba(16,185,129,0.4)';
             setTimeout(() => {
                 closeModal();
                 setTimeout(() => {
-                    addToLogBtn.innerText = 'ADD TO DAILY LOG';
-                    addToLogBtn.style.backgroundColor = '';
-                    addToLogBtn.style.boxShadow = '';
+                    addBtn.textContent = 'Add to Daily Log';
+                    addBtn.style.background = '';
+                    addBtn.style.boxShadow = '';
                 }, 500);
             }, 1500);
+        });
+
+        // --- Workout filter buttons ---
+        const filters = ['filter-cardio', 'filter-strength', 'filter-yoga'];
+        filters.forEach(id => {
+            document.getElementById(id)?.addEventListener('click', function() {
+                filters.forEach(f => {
+                    const el = document.getElementById(f);
+                    el?.classList.remove('bg-white', 'text-black');
+                });
+                this.classList.add('bg-white', 'text-black');
+            });
         });
     </script>
 </body>
